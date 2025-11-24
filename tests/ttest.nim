@@ -68,6 +68,11 @@ suite "gpr parser":
     let percentProg = parseGcode("%")
     check percentProg.getBlock(0).chunks[0].kind == ckPercent
 
+  test "percent chunk equality with saved debug text":
+    let p = parseGcodeSavingBlockText("%")
+    let percentChunk = Chunk(kind: ckPercent)
+    check p.getBlock(0).chunkAt(0) == percentChunk
+
   test "lex block with isolated P word":
     let program = "/%G99 G82 R0.1 Z-0.1227 P F15.04"
     let lexedLine = lexBlock(program)
