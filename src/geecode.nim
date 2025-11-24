@@ -48,6 +48,20 @@ const
 proc isNumChar(c: char): bool =
   c.isDigit or c == '.' or c == '-'
 
+proc formatDouble(val: float): string =
+  let intVal = int(val)
+  if float(intVal) == val:
+    return $intVal
+
+  var repr = $val
+  if repr.contains('.'):
+    while repr.len > 0 and repr[repr.high] == '0':
+      repr.setLen(repr.len - 1)
+    if repr.len > 0 and repr[repr.high] == '.':
+      repr.setLen(repr.len - 1)
+
+  repr
+
 proc `==`*(a, b: Address): bool =
   if a.kind != b.kind:
     return false
@@ -75,7 +89,7 @@ proc `$`*(a: Address): string =
   of akInteger:
     result = $a.intVal
   of akDouble:
-    result = $a.floatVal
+    result = formatDouble(a.floatVal)
 
 proc `$`*(c: Chunk): string =
   case c.kind
@@ -113,14 +127,14 @@ proc lineNumber*(b: Block): int =
 proc parseIntToken(token: string): int =
   var value: int
   let parsed = parseInt(token, value, 0)
-  if parsed != token.len:
+  if parsed == 0:
     raise newException(ValueError, fmt"Invalid integer token '{token}'")
   value
 
 proc parseFloatToken(token: string): float =
   var value: float
   let parsed = parseFloat(token, value, 0)
-  if parsed != token.len:
+  if parsed == 0:
     raise newException(ValueError, fmt"Invalid float token '{token}'")
   value
 
