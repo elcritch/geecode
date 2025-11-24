@@ -1,6 +1,6 @@
 import std/unittest
 
-import gpr
+import geecode
 
 suite "gpr parser":
   test "one line program":
