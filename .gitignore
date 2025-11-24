@@ -1,0 +1,7 @@
+# ignore files with no extention:
+*
+!*/
+!*.*
+# others
+deps/
+nim.cfg
