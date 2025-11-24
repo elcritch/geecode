@@ -3,9 +3,9 @@ import std/[os, unittest]
 import geecode
 
 proc samplePath(name: string): string =
-  parentDir(getAppDir()) / "deps/gpr/gcode_samples" / name
+  parentDir(getAppDir()) / "tests/gcode_samples" / name
 
-suite "gpr parser":
+suite "geecode parser":
   test "one line program":
     let p = parseGcode("G0 X1.0 Y1.0")
     check p.numBlocks == 1
