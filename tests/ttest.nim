@@ -5,11 +5,13 @@ import geecode
 suite "gpr parser":
   test "one line program":
     let p = parseGcode("G0 X1.0 Y1.0")
+    echo "P: ", p
     check p.numBlocks == 1
     check p.getBlock(0).size == 3
 
   test "two lines with delete and line numbers":
     let p = parseGcode("(*** Toolpath 1 ***)\n/M23 [ And so is this ]\nN103 G1 X1.0 F23.0")
+    echo "P: ", p
     check p.numBlocks == 3
     check p.getBlock(1).isDeleted
     check p.getBlock(2).hasLineNumber
