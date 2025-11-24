@@ -5,3 +5,4 @@
 # others
 deps/
 nim.cfg
+.nimcache
