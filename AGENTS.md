@@ -14,13 +14,8 @@ This repository ships a small Nim-based agent CLI. It keeps the agent contract i
 
 ## Using the Agent
 1. Install dependencies with Atlas (no Nimble):
-   - `atlas init` (once per fresh clone to mark the project)
    - `atlas install`
-2. Build and run the CLI directly with Nim:
-   - `nim c -r src/geecode.nim describe`
-   - `nim c -r src/geecode.nim plan --task:"Document the API"`
-   - `nim c -r src/geecode.nim doc`
-3. After the first build, you can run the binary without recompiling until sources change (default location: `src/geecode`).
+2. Run tests with `nim test`
 
 ## Notes
 - Dependencies are pinned via `geecode.nimble` and installed with `atlas`; avoid invoking `nimble` directly.
