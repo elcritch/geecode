@@ -13,10 +13,8 @@ Geecode is a Nim library for parsing G-code programs into a structured represent
 Use Atlas for dependency setup:
 
 ```sh
-atlas install
+atlas use https://github.com/elcritch/geecode
 ```
-
-**Never** use Nimble for this project.
 
 ## Usage
 A minimal example showing parsing and inspection:
@@ -25,14 +23,14 @@ A minimal example showing parsing and inspection:
 import geecode
 
 let program = parseGcode("N10 G1 X1.0 Y2.0 ; move")
-let block = program.getBlock(0)
+let blks = program.getBlock(0)
 
 echo program.numBlocks       # 1
-echo block.chunkAt(0)        # G1
-echo block.chunkAt(2)        # Y2.0
+echo blks.chunkAt(0)        # G1
+echo blks.chunkAt(2)        # Y2.0
 
-let withDebug = parseGcodeSavingBlockText("G0 X0 Y0")
-echo withDebug.getBlock(0).debugText  # "G0 X0 Y0 "
+let debugProgram = parseGcodeSavingBlockText("G0 X0 Y0")
+echo debugProgram.getBlock(0).debugText  # "G0 X0 Y0 "
 ```
 
 ## Tests
