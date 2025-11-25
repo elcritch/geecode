@@ -48,60 +48,58 @@ proc formatFloat(value: float): string =
       repr.setLen(repr.len - 1)
   repr
 
-proc addWord(parts: var seq[string], prefix: char, value: float) =
+proc addWord(parts: var string, prefix: char, value: float) =
   if not value.isNaN:
-    parts.add($prefix & formatFloat(value))
+    parts.add(" ")
+    parts.add($prefix)
+    parts.add(formatFloat(value))
 
-proc addMovement(parts: var seq[string], motion: XYCommand) =
+proc addMovement(parts: var string, motion: XYCommand) =
   addWord(parts, 'X', motion.X)
   addWord(parts, 'Y', motion.Y)
   addWord(parts, 'Z', motion.Z)
   addWord(parts, 'F', motion.feedRate)
 
-proc toGcode*(cmd: GCode): string =
-  var parts: seq[string] = @[]
-  if cmd of MoveTo:
-    parts.add "G0"
-    addMovement(parts, MoveTo(cmd))
-  elif cmd of LineTo:
-    parts.add "G1"
-    addMovement(parts, LineTo(cmd))
-  elif cmd of CwArcTo:
-    let arc = CwArcTo(cmd)
-    parts.add "G2"
-    addMovement(parts, arc)
-    addWord(parts, 'I', arc.centerX)
-    addWord(parts, 'J', arc.centerJ)
-  elif cmd of CcwArcTo:
-    let arc = CcwArcTo(cmd)
-    parts.add "G3"
-    addMovement(parts, arc)
-    addWord(parts, 'I', arc.centerX)
-    addWord(parts, 'J', arc.centerJ)
-  elif cmd of UnitsInches:
-    parts.add "G20"
-  elif cmd of UnitsMillimeters:
-    parts.add "G21"
-  elif cmd of PlaneXY:
-    parts.add "G17"
-  elif cmd of PlaneXZ:
-    parts.add "G18"
-  elif cmd of PlaneYZ:
-    parts.add "G19"
-  elif cmd of GotoHome:
-    parts.add "G28"
-  elif cmd of AbsoluteMode:
-    parts.add "G90"
-  elif cmd of RelativeMode:
-    parts.add "G91"
-  else:
+method toGcode*(cmd: GCode): string {.base.} =
     raise newException(ValueError, "Unsupported GCode command")
-  parts.join(" ")
+
+method toGcode*(cmd: MoveTo): string =
+    result.add "G0"
+    result.addMovement(cmd)
+method toGcode*(cmd: LineTo): string =
+    result.add "G1"
+    result.addMovement(cmd)
+method toGcode*(arc: CwArcTo): string =
+    result.add "G2"
+    result.addMovement(arc)
+    result.addWord('I', arc.centerX)
+    result.addWord('J', arc.centerJ)
+method toGcode*(arc: CcwArcTo): string =
+    result.add "G3"
+    result.addMovement(arc)
+    result.addWord('I', arc.centerX)
+    result.addWord('J', arc.centerJ)
+method toGcode*(cmd: UnitsInches): string =
+    result.add "G20"
+method toGcode*(cmd: UnitsMillimeters): string =
+    result.add "G21"
+method toGcode*(cmd: PlaneXY): string =
+    result.add "G17"
+method toGcode*(cmd: PlaneXZ): string =
+    result.add "G18"
+method toGcode*(cmd: PlaneYZ): string =
+    result.add "G19"
+method toGcode*(cmd: GotoHome): string =
+    result.add "G28"
+method toGcode*(cmd: AbsoluteMode): string =
+    result.add "G90"
+method toGcode*(cmd: RelativeMode): string =
+    result.add "G91"
 
 proc toGcode*(commands: openArray[GCode]): string =
   var lines: seq[string] = @[]
   for cmd in commands:
-    lines.add toGcode(cmd)
+    lines.add(cmd.toGcode())
   lines.join("\n")
 
 macro paths*(body: untyped): untyped =
