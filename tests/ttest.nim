@@ -34,11 +34,11 @@ suite "geecode parser":
   test "correct first token comparisons":
     let p = parseGcode("G0 X1.0 Y1.0\nG1 X0.0 Y0.0 Z1.2 F12.0")
 
-    let g1 = Chunk(kind: ckWordAddress, word: 'G', address: Address(kind: akInteger, intVal: 1))
+    let g1 = Chunk(kind: ckCommand, commandWord: 'G', intVal: 1)
     check p.getBlock(1).chunkAt(0) == g1
     check p.getBlock(0).chunkAt(0) != g1
 
-    let f12 = Chunk(kind: ckWordAddress, word: 'F', address: Address(kind: akDouble, floatVal: 12.0))
+    let f12 = Chunk(kind: ckWordAddress, word: 'F', address: 12.0)
     check p.getBlock(1).chunkAt(4) == f12
     check p.getBlock(1).chunkAt(3) != f12
 

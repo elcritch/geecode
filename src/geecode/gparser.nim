@@ -13,7 +13,7 @@ type
       floatVal*: float
 
   ChunkKind* = enum
-    ckComment, ckWordAddress, ckPercent, ckWord
+    ckComment, ckCommand, ckWordAddress, ckPercent, ckWord
 
   Chunk* = object
     case kind*: ChunkKind
@@ -21,9 +21,12 @@ type
       leftDelim*: char
       rightDelim*: char
       commentText*: string
+    of ckCommand:
+      commandWord*: char
+      intVal*: int
     of ckWordAddress:
       word*: char
-      address*: Address
+      address*: float
     of ckPercent:
       discard
     of ckWord:
@@ -78,6 +81,8 @@ proc `==`*(a, b: Chunk): bool =
   case a.kind
   of ckComment:
     result = a.leftDelim == b.leftDelim and a.rightDelim == b.rightDelim and a.commentText == b.commentText
+  of ckCommand:
+    result = a.commandWord == b.commandWord and a.intVal == b.intVal
   of ckWordAddress:
     result = a.word == b.word and a.address == b.address
   of ckPercent:
@@ -96,8 +101,10 @@ proc `$`*(c: Chunk): string =
   case c.kind
   of ckComment:
     result = $c.leftDelim & c.commentText & $c.rightDelim
+  of ckCommand:
+    result = $c.commandWord & $c.intVal
   of ckWordAddress:
-    result = $c.word & $c.address
+    result = $c.word & c.address.formatDouble()
   of ckPercent:
     result = "%"
   of ckWord:
@@ -178,7 +185,11 @@ proc parseChunk(tokens: seq[string], idx: var int): Chunk =
     if nextToken.len == 0 or not isNumChar(nextToken[0]):
       return Chunk(kind: ckWord, singleWord: token[0])
     let address = parseAddress(token[0], tokens, idx)
-    return Chunk(kind: ckWordAddress, word: token[0], address: address)
+    case address.kind:
+    of akInteger:
+      return Chunk(kind: ckCommand, commandWord: token[0], intVal: address.intVal)
+    of akDouble:
+      return Chunk(kind: ckWordAddress, word: token[0], address: address.floatVal)
 
 proc parseTokens(tokens: seq[string]): Block =
   if tokens.len == 0:
