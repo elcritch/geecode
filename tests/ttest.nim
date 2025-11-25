@@ -34,7 +34,7 @@ suite "geecode parser":
   test "correct first token comparisons":
     let p = parseGcode("G0 X1.0 Y1.0\nG1 X0.0 Y0.0 Z1.2 F12.0")
 
-    let g1 = Chunk(kind: ckCommand, commandWord: 'G', intVal: 1)
+    let g1 = Chunk(kind: ckCommand, commandWord: 'G', id: 1)
     check p.getBlock(1).chunkAt(0) == g1
     check p.getBlock(0).chunkAt(0) != g1
 

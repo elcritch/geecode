@@ -8,7 +8,7 @@ type
   Address* = object
     case kind*: AddressKind
     of akInteger:
-      intVal*: int
+      id*: int
     of akDouble:
       floatVal*: float
 
@@ -23,7 +23,7 @@ type
       commentText*: string
     of ckCommand:
       commandWord*: char
-      intVal*: int
+      id*: int
     of ckWordAddress:
       word*: char
       address*: float
@@ -53,9 +53,9 @@ proc isNumChar(c: char): bool =
   c.isDigit or c == '.' or c == '-'
 
 proc formatDouble(val: float): string =
-  let intVal = int(val)
-  if float(intVal) == val:
-    return $intVal
+  let id = int(val)
+  if float(id) == val:
+    return $id
 
   var repr = $val
   if repr.contains('.'):
@@ -71,7 +71,7 @@ proc `==`*(a, b: Address): bool =
     return false
   case a.kind
   of akInteger:
-    result = a.intVal == b.intVal
+    result = a.id == b.id
   of akDouble:
     result = a.floatVal == b.floatVal
 
@@ -82,7 +82,7 @@ proc `==`*(a, b: Chunk): bool =
   of ckComment:
     result = a.leftDelim == b.leftDelim and a.rightDelim == b.rightDelim and a.commentText == b.commentText
   of ckCommand:
-    result = a.commandWord == b.commandWord and a.intVal == b.intVal
+    result = a.commandWord == b.commandWord and a.id == b.id
   of ckWordAddress:
     result = a.word == b.word and a.address == b.address
   of ckPercent:
@@ -93,7 +93,7 @@ proc `==`*(a, b: Chunk): bool =
 proc `$`*(a: Address): string =
   case a.kind
   of akInteger:
-    result = $a.intVal
+    result = $a.id
   of akDouble:
     result = formatDouble(a.floatVal)
 
@@ -102,7 +102,7 @@ proc `$`*(c: Chunk): string =
   of ckComment:
     result = $c.leftDelim & c.commentText & $c.rightDelim
   of ckCommand:
-    result = $c.commandWord & $c.intVal
+    result = $c.commandWord & $c.id
   of ckWordAddress:
     result = $c.word & c.address.formatDouble()
   of ckPercent:
@@ -154,7 +154,7 @@ proc parseAddress(word: char, tokens: seq[string], idx: var int): Address =
   if word in doubleWords:
     result = Address(kind: akDouble, floatVal: parseFloatToken(token))
   elif word in intWords:
-    result = Address(kind: akInteger, intVal: parseIntToken(token))
+    result = Address(kind: akInteger, id: parseIntToken(token))
   else:
     raise newException(ValueError, fmt"Unsupported word '{word}'")
   inc idx
@@ -187,7 +187,7 @@ proc parseChunk(tokens: seq[string], idx: var int): Chunk =
     let address = parseAddress(token[0], tokens, idx)
     case address.kind:
     of akInteger:
-      return Chunk(kind: ckCommand, commandWord: token[0], intVal: address.intVal)
+      return Chunk(kind: ckCommand, commandWord: token[0], id: address.id)
     of akDouble:
       return Chunk(kind: ckWordAddress, word: token[0], address: address.floatVal)
 
