@@ -6,3 +6,4 @@
 deps/
 nim.cfg
 .nimcache
+*.out
