@@ -13,7 +13,7 @@ type
     E*: float = NaN
     feedRate*: float = NaN
 
-  FastGoto* = ref object of XYCommand
+  MoveTo* = ref object of XYCommand
   LineTo* = ref object of XYCommand
   LinearTo* = LineTo
 
@@ -95,7 +95,7 @@ proc addMovement(parts: var string, motion: XYCommand) =
 method toGcode*(cmd: GCode): string {.base.} =
     raise newException(ValueError, "Unsupported GCode command")
 
-method toGcode*(cmd: FastGoto): string =
+method toGcode*(cmd: MoveTo): string =
     result.add "G0"
     result.addMovement(cmd)
 method toGcode*(cmd: LineTo): string =
